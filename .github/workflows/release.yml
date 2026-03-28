@@ -134,7 +134,7 @@ jobs:
           done
 
       - name: Upload Linux artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: linux-artifacts
           path: |
@@ -235,7 +235,7 @@ jobs:
           done
 
       - name: Upload Flatpak artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: flatpak-artifacts
           path: |
@@ -295,7 +295,7 @@ jobs:
           PYTHONUTF8: "1"
 
       - name: Upload Windows artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: windows-artifacts
           path: dist/SafeToolDownloader-*-windows-setup.exe
@@ -364,7 +364,7 @@ jobs:
           APP_VERSION: ${{ steps.version.outputs.tag }}
 
       - name: Upload macOS artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: macos-artifacts
           path: dist/SafeToolDownloader-*-macos.dmg
@@ -386,7 +386,7 @@ jobs:
           fetch-depth: 0
 
       - name: Download all artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           path: release-assets
           merge-multiple: true
