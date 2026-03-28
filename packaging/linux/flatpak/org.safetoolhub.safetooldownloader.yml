@@ -1,0 +1,48 @@
+# Flatpak manifest for SafeTool Downloader
+# Uses the pre-built PyInstaller binary (dist/safetool-downloader/) as source.
+# Build with: flatpak-builder --user --force-clean --repo=repo build-dir packaging/linux/flatpak/org.safetoolhub.safetooldownloader.yml
+# Bundle:     flatpak build-bundle repo SafeToolDownloader.flatpak org.safetoolhub.safetooldownloader
+
+app-id: org.safetoolhub.safetooldownloader
+runtime: org.freedesktop.Platform
+runtime-version: '23.08'
+sdk: org.freedesktop.Sdk
+command: safetool-downloader-desktop
+
+finish-args:
+  # File access for saving downloads
+  - --filesystem=home
+  # Network access for scanning and downloading
+  - --share=network
+  # Display
+  - --share=ipc
+  - --socket=x11
+  - --socket=wayland
+  - --socket=fallback-x11
+  # GPU acceleration
+  - --device=dri
+
+modules:
+  - name: safetool-downloader
+    buildsystem: simple
+    build-commands:
+      # Install the pre-built PyInstaller bundle
+      - install -d /app/opt/safetool-downloader
+      - cp -a dist/safetool-downloader/* /app/opt/safetool-downloader/
+
+      # Launcher script
+      - install -Dm755 packaging/linux/flatpak/safetool-downloader-launcher.sh /app/bin/safetool-downloader-desktop
+
+      # Desktop file (icon name must match app-id for appstream-compose)
+      - install -Dm644 packaging/linux/appimage/safetool-downloader.desktop /app/share/applications/org.safetoolhub.safetooldownloader.desktop
+      - sed -i 's/^Icon=.*/Icon=org.safetoolhub.safetooldownloader/' /app/share/applications/org.safetoolhub.safetooldownloader.desktop
+
+      # Icon
+      - install -Dm644 assets/icon.png /app/share/icons/hicolor/512x512/apps/org.safetoolhub.safetooldownloader.png
+
+      # AppStream metainfo
+      - install -Dm644 packaging/linux/flatpak/org.safetoolhub.safetooldownloader.metainfo.xml /app/share/metainfo/org.safetoolhub.safetooldownloader.metainfo.xml
+
+    sources:
+      - type: dir
+        path: ../../..

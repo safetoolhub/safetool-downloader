@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=SafeTool Downloader
+GenericName=Web File Downloader
+Comment=Download files from websites — scan, preview, and batch download
+Exec=safetool-downloader-desktop %U
+Icon=safetool-downloader
+Terminal=false
+Categories=Network;FileTransfer;Utility;
+Keywords=download;web;file;batch;
+StartupNotify=true
+StartupWMClass=SafeTool Downloader

@@ -1,0 +1,5 @@
+PySide6-Essentials>=6.7
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=5.0
+qtawesome>=1.4

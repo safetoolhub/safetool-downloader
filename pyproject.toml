@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "safetool-downloader"
+version = "0.1.0"
+description = "Desktop application to download files from websites — scan, preview, and batch download."
+requires-python = ">=3.11"
+authors = [
+    { name = "safetoolhub.org", email = "safetoolhub@protonmail.com" },
+]
+
+dependencies = [
+    "PySide6-Essentials>=6.7",
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+    "lxml>=5.0",
+    "qtawesome>=1.4",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pyinstaller>=6.0"]
+
+[project.gui-scripts]
+safetool-downloader-desktop = "safetool_downloader_desktop.app:main"
+
+[tool.setuptools.packages.find]
+include = ["safetool_downloader_desktop*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# AppRun — standard entry point for the SafeTool Downloader AppImage
+# SafeTool Downloader Packaging
+# Copyright (C) 2026 safetoolhub.org
+# License: GPL-3.0-or-later
+
+set -euo pipefail
+
+SELF="$(readlink -f "$0")"
+APPDIR="${SELF%/*}"
+
+exec "${APPDIR}/opt/safetool-downloader/safetool-downloader-desktop" "$@"

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SafeTool Downloader AppStream metainfo
+     Copyright (C) 2026 safetoolhub.org
+     License: GPL-3.0-or-later -->
+<component type="desktop-application">
+  <id>org.safetoolhub.safetooldownloader</id>
+  <name>SafeTool Downloader</name>
+  <summary>Web file downloader with preview and filtering</summary>
+  <metadata_license>GPL-3.0-or-later</metadata_license>
+  <project_license>GPL-3.0-or-later</project_license>
+
+  <description>
+    <p>
+      SafeTool Downloader scans websites for downloadable files, shows a
+      preview with type filters, and allows batch downloading with individual
+      progress bars.
+    </p>
+    <p>Features:</p>
+    <ul>
+      <li>Scan any URL for downloadable files</li>
+      <li>Recursive scan across multiple pages (BFS, same-domain)</li>
+      <li>Filter files by type: PDF, images, audio, video, archives, etc.</li>
+      <li>Preview with file size, extension, and source page</li>
+      <li>Batch download with per-file progress tracking</li>
+      <li>Automatic filename conflict resolution</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">org.safetoolhub.safetooldownloader.desktop</launchable>
+
+  <url type="homepage">https://safetoolhub.org</url>
+  <url type="bugtracker">https://github.com/safetoolhub/safetool-downloader/issues</url>
+
+  <developer_name>SafeToolHub</developer_name>
+
+  <provides>
+    <binary>safetool-downloader-desktop</binary>
+  </provides>
+
+  <content_rating type="oars-1.1" />
+
+  <categories>
+    <category>Network</category>
+    <category>FileTransfer</category>
+    <category>Utility</category>
+  </categories>
+
+  <keywords>
+    <keyword>download</keyword>
+    <keyword>web</keyword>
+    <keyword>file</keyword>
+    <keyword>batch</keyword>
+    <keyword>scraper</keyword>
+  </keywords>
+</component>
