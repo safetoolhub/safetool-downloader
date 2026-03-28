@@ -420,6 +420,7 @@ jobs:
         with:
           tag_name: v${{ steps.prerelease.outputs.tag }}
           name: "SafeTool Downloader v${{ steps.prerelease.outputs.tag }}"
+          target_commitish: ${{ github.sha }}
           draft: true
           prerelease: ${{ steps.prerelease.outputs.is_prerelease }}
           generate_release_notes: true
