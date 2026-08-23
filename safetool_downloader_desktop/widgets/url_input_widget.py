@@ -220,8 +220,8 @@ class UrlInputWidget(QWidget):
         self._options_stack = QStackedWidget()
 
         # Web options page
-        web_options = QWidget()
-        web_options_layout = QHBoxLayout(web_options)
+        self._web_options = QWidget()
+        web_options_layout = QHBoxLayout(self._web_options)
         web_options_layout.setContentsMargins(0, 0, 0, 0)
         web_options_layout.setSpacing(DesignSystem.SPACE_16)
 
@@ -321,11 +321,11 @@ class UrlInputWidget(QWidget):
         web_options_layout.addWidget(self._delay_spin)
         
         web_options_layout.addStretch()
-        self._options_stack.addWidget(web_options)
+        self._options_stack.addWidget(self._web_options)
 
         # Direct options page
-        direct_options = QWidget()
-        direct_options_layout = QHBoxLayout(direct_options)
+        self._direct_options = QWidget()
+        direct_options_layout = QHBoxLayout(self._direct_options)
         direct_options_layout.setContentsMargins(0, 0, 0, 0)
         direct_options_layout.setSpacing(DesignSystem.SPACE_12)
 
@@ -335,7 +335,7 @@ class UrlInputWidget(QWidget):
         self._auto_download_check.setChecked(False)
         direct_options_layout.addWidget(self._auto_download_check)
         direct_options_layout.addStretch()
-        self._options_stack.addWidget(direct_options)
+        self._options_stack.addWidget(self._direct_options)
 
         # RSS placeholder (empty widget, same height)
         rss_placeholder = QWidget()
