@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "safetool-downloader"
-version = "0.1.0"
+version = "0.3.0"
 description = "Desktop application to download files from websites — scan, preview, and batch download."
 requires-python = ">=3.11"
 authors = [
@@ -17,6 +17,7 @@ dependencies = [
     "beautifulsoup4>=4.12",
     "lxml>=5.0",
     "qtawesome>=1.4",
+    "mutagen>=1.47",
 ]
 
 [project.optional-dependencies]

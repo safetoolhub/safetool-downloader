@@ -41,23 +41,32 @@ class IconManager:
         "download": "mdi6.download",
         "download-multiple": "mdi6.download-multiple",
         "web": "mdi6.web",
+        "rss": "mdi6.rss",
         "link": "mdi6.link-variant",
         "folder-open": "mdi6.folder-open-outline",
         "folder-download": "mdi6.folder-arrow-down",
+        "folder-tree": "mdi6.file-tree-outline",
         "refresh": "mdi6.refresh",
         "cancel": "mdi6.cancel",
         "stop": "mdi6.stop-circle-outline",
         "magnify": "mdi6.magnify",
+        "image": "mdi6.image-outline",
+        "video": "mdi6.video-outline",
+        "archive": "mdi6.archive-outline",
 
         # File types
         "file-pdf": "mdi6.file-pdf-box",
         "file-document": "mdi6.file-document-outline",
+        "file-document-multiple": "mdi6.file-document-multiple-outline",
         "file-image": "mdi6.file-image-outline",
         "file-music": "mdi6.file-music-outline",
         "file-video": "mdi6.file-video-outline",
         "file-code": "mdi6.file-code-outline",
         "file-archive": "mdi6.zip-box-outline",
+        "file-executable": "mdi6.application-cog-outline",
+        "file-disk-image": "mdi6.disc",
         "file-unknown": "mdi6.file-question-outline",
+        "file-text": "mdi6.text-box-outline",
 
         # Actions
         "select-all": "mdi6.select-all",
@@ -66,6 +75,7 @@ class IconManager:
         "filter": "mdi6.filter-outline",
         "check-bold": "mdi6.check-bold",
         "eye": "mdi6.eye-outline",
+        "eye-off": "mdi6.eye-off-outline",
 
         # Status
         "progress-clock": "mdi6.progress-clock",
@@ -77,6 +87,7 @@ class IconManager:
         "settings": "mdi6.cog-outline",
         "wifi-off": "mdi6.wifi-off",
         "shield": "mdi6.shield-outline",
+        "shield-check": "mdi6.shield-check-outline",
         "open-in-new": "mdi6.open-in-new",
 
         # Recursive crawling
