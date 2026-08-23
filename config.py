@@ -12,7 +12,7 @@ from __future__ import annotations
 
 # ── Identity ─────────────────────────────────────────────────────────
 APP_NAME: str = "SafeTool Downloader"
-APP_VERSION: str = "0.1.0"
+APP_VERSION: str = "0.3.0"
 APP_VERSION_SUFFIX: str = "beta"
 
 # ── Author / Organisation ────────────────────────────────────────────

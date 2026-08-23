@@ -5,6 +5,32 @@
 
 Centralized design system providing consistent CSS tokens and reusable
 style methods. Adapted from SafeTool PDF design system for PySide6.
+
+Existe un fallo en Linux por el cual en los tooltips se sorbreescribe la caja CSS de fondo que se 
+intenta dibujar, reemplazándola por el color predeterminado genérico del sistema (el grisáceo `Window`), 
+por un grave fallo del renderizador QSS en algunos entornos (muy probablemente en combinación con Wayland 
+o tu gestor de ventanas actual)-
+Solución definitiva: por ello, siempre que se implementen tooltips hay que eliminar completamente las 
+reglas CSS del tooltip (`QToolTip { ... }`) de `DesignSystem.py` e indicarle a la aplicación 
+que NO intente dibujarlo de esa manera. En su lugar, hay que configurar el entorno profundo con `QPalette` 
+para forzar `ToolTipBase` a `#000000` y `ToolTipText` a `#FFFFFF`, quitar el CSS que choca y falla, 
+y entonces la aplicación dibujará los tooltips 100% de forma nativa a través del sistema gráfico usando 
+la configuración de paleta que impusimos.
+
+¡IMPORTANTE!: Nunca usar texto enriquecido ni etiquetas HTML (`<b>`, `<p>`, `<br>`) en `.setToolTip()`.
+Dado que Qt renderiza el HTML usando QTextDocument, esto anula la variable ToolTipBase volviendo al
+bug original del fondo gris. Usar siempre texto plano con saltos de línea (`\n`).
+
+¡MUY IMPORTANTE!: Si aplicas un estilo inline a un widget padre (`setStyleSheet(...)`), SIEMPRE
+debes restringirlo a la clase (ej. `"QToolButton { border: none; }"`). Si lo dejas libre 
+(`"border: none;"`), Qt aplicará ese reseteo a todos los hijos generados, incluyendo el `QToolTip`,
+rompiendo la recuperación de color blanco del texto.
+
+Esto asegura que sea el propio motor de la plataforma (libre de bugs del CSS render y QTextDocument) 
+el que dibuje un tooltip negro liso y natural con texto blanco.
+
+
+
 """
 
 from __future__ import annotations
@@ -89,8 +115,8 @@ class DesignSystem:
 
     # ==================== DIMENSIONS ====================
 
-    WINDOW_MIN_WIDTH = 900
-    WINDOW_MIN_HEIGHT = 650
+    WINDOW_MIN_WIDTH = 1050
+    WINDOW_MIN_HEIGHT = 780
     HEADER_HEIGHT = 50
 
     # ==================== HELPERS ====================
@@ -112,11 +138,9 @@ class DesignSystem:
         return f"""
             * {{ font-family: {DesignSystem.FONT_FAMILY_BASE}; }}
             QMainWindow {{ background-color: {DesignSystem.COLOR_BACKGROUND}; }}
-            QWidget {{ color: {DesignSystem.COLOR_TEXT}; }}
-            QToolTip {{
-                background-color: #2D3436; color: #F5F6FA; border: none;
-                border-radius: {DesignSystem.RADIUS_SM}px; padding: 4px 8px;
-            }}
+            
+            /* Tooltips are now fully driven by QPalette in app.py to avoid 
+               Linux/Wayland compositor background-clipping bugs */
         """
 
     # ==================== HEADER ====================
@@ -253,6 +277,45 @@ class DesignSystem:
         """
 
     @staticmethod
+    def get_url_combo_style() -> str:
+        """Style for the editable URL history QComboBox."""
+        return (
+            f"QComboBox {{"
+            f" border: 2px solid {DesignSystem.COLOR_BORDER};"
+            f" border-radius: {DesignSystem.RADIUS_MD}px;"
+            f" padding: 2px 2px 2px 12px;"
+            f" font-size: {DesignSystem.FONT_SIZE_MD}px;"
+            f" color: {DesignSystem.COLOR_TEXT};"
+            f" background-color: {DesignSystem.COLOR_SURFACE};"
+            f" min-height: 40px;"
+            f"}}"
+            f" QComboBox:hover {{ border-color: {DesignSystem.COLOR_PRIMARY_HOVER}; }}"
+            f" QComboBox QLineEdit {{"
+            f" border: none; background: transparent; padding: 0; margin: 0;"
+            f" font-size: {DesignSystem.FONT_SIZE_MD}px;"
+            f" color: {DesignSystem.COLOR_TEXT};"
+            f"}}"
+            f" QComboBox::drop-down {{ border: none; width: 28px; }}"
+            f" QComboBox::down-arrow {{"
+            f" image: none;"
+            f" width: 0px; height: 0px;"
+            f" border-left: 5px solid transparent;"
+            f" border-right: 5px solid transparent;"
+            f" border-top: 6px solid {DesignSystem.COLOR_TEXT_SECONDARY};"
+            f" margin-right: 10px;"
+            f"}}"
+            f" QComboBox QAbstractItemView {{"
+            f" border: 1px solid {DesignSystem.COLOR_BORDER};"
+            f" background-color: {DesignSystem.COLOR_SURFACE};"
+            f" color: {DesignSystem.COLOR_TEXT};"
+            f" selection-background-color: {DesignSystem.COLOR_PRIMARY_SUBTLE};"
+            f" selection-color: {DesignSystem.COLOR_TEXT};"
+            f" font-size: {DesignSystem.FONT_SIZE_BASE}px;"
+            f" outline: none;"
+            f"}}"
+        )
+
+    @staticmethod
     def get_scan_button_style() -> str:
         return f"""
             QPushButton {{
@@ -281,8 +344,8 @@ class DesignSystem:
                     color: {DesignSystem.COLOR_PRIMARY_TEXT};
                     border: 1px solid {DesignSystem.COLOR_PRIMARY};
                     border-radius: {DesignSystem.RADIUS_FULL}px;
-                    padding: 6px 16px;
-                    font-size: {DesignSystem.FONT_SIZE_SM}px;
+                    padding: 3px 12px;
+                    font-size: {DesignSystem.FONT_SIZE_XS}px;
                     font-weight: {DesignSystem.FONT_WEIGHT_MEDIUM};
                 }}
                 QPushButton:hover {{
@@ -295,8 +358,8 @@ class DesignSystem:
                 color: {DesignSystem.COLOR_TEXT_SECONDARY};
                 border: 1px solid {DesignSystem.COLOR_BORDER};
                 border-radius: {DesignSystem.RADIUS_FULL}px;
-                padding: 6px 16px;
-                font-size: {DesignSystem.FONT_SIZE_SM}px;
+                padding: 3px 12px;
+                font-size: {DesignSystem.FONT_SIZE_XS}px;
                 font-weight: {DesignSystem.FONT_WEIGHT_MEDIUM};
             }}
             QPushButton:hover {{
@@ -384,12 +447,13 @@ class DesignSystem:
             bg = DesignSystem.COLOR_DANGER_BG
         elif status == "downloading":
             bg = DesignSystem.COLOR_PRIMARY_LIGHT
+        elif status == "skipped":
+            bg = DesignSystem.COLOR_BACKGROUND
         else:
             bg = DesignSystem.COLOR_SURFACE
         return (
             f"QFrame {{ background-color: {bg};"
-            f" border-bottom: 1px solid {DesignSystem.COLOR_BORDER_LIGHT};"
-            f" padding: 6px 12px; }}"
+            f" border-bottom: 1px solid {DesignSystem.COLOR_BORDER_LIGHT}; }}"
         )
 
     # ==================== FORMS ====================
@@ -425,19 +489,46 @@ class DesignSystem:
     @staticmethod
     def get_spinbox_style() -> str:
         return (
-            f"QSpinBox {{ border: 1px solid {DesignSystem.COLOR_BORDER};"
+            f"QAbstractSpinBox {{ border: 1px solid {DesignSystem.COLOR_BORDER};"
             f" border-radius: {DesignSystem.RADIUS_BASE}px; padding: 6px 8px;"
             f" background-color: {DesignSystem.COLOR_SURFACE};"
             f" color: {DesignSystem.COLOR_TEXT};"
             f" font-size: {DesignSystem.FONT_SIZE_BASE}px; min-height: 36px; }}"
-            f" QSpinBox:hover {{ border-color: {DesignSystem.COLOR_PRIMARY}; }}"
+            f" QAbstractSpinBox:hover {{ border-color: {DesignSystem.COLOR_PRIMARY}; }}"
+            f" QAbstractSpinBox::up-button {{ subcontrol-origin: border;"
+            f" subcontrol-position: top right; width: 20px;"
+            f" border-left: 1px solid {DesignSystem.COLOR_BORDER};"
+            f" border-bottom: 1px solid {DesignSystem.COLOR_BORDER};"
+            f" border-top-right-radius: {DesignSystem.RADIUS_BASE}px;"
+            f" background-color: {DesignSystem.COLOR_BACKGROUND}; }}"
+            f" QAbstractSpinBox::up-button:hover {{ background-color: {DesignSystem.COLOR_SECONDARY_LIGHT}; }}"
+            f" QAbstractSpinBox::down-button {{ subcontrol-origin: border;"
+            f" subcontrol-position: bottom right; width: 20px;"
+            f" border-left: 1px solid {DesignSystem.COLOR_BORDER};"
+            f" border-top: none;"
+            f" border-bottom-right-radius: {DesignSystem.RADIUS_BASE}px;"
+            f" background-color: {DesignSystem.COLOR_BACKGROUND}; }}"
+            f" QAbstractSpinBox::down-button:hover {{ background-color: {DesignSystem.COLOR_SECONDARY_LIGHT}; }}"
+            f" QAbstractSpinBox::up-arrow {{ image: none;"
+            f" border-left: 4px solid transparent; border-right: 4px solid transparent;"
+            f" border-bottom: 5px solid {DesignSystem.COLOR_TEXT_SECONDARY};"
+            f" width: 0px; height: 0px; }}"
+            f" QAbstractSpinBox::up-arrow:hover {{ border-bottom-color: {DesignSystem.COLOR_TEXT}; }}"
+            f" QAbstractSpinBox::up-arrow:pressed {{ border-bottom-color: {DesignSystem.COLOR_TEXT}; }}"
+            f" QAbstractSpinBox::down-arrow {{ image: none;"
+            f" border-left: 4px solid transparent; border-right: 4px solid transparent;"
+            f" border-top: 5px solid {DesignSystem.COLOR_TEXT_SECONDARY};"
+            f" width: 0px; height: 0px; }}"
+            f" QAbstractSpinBox::down-arrow:hover {{ border-top-color: {DesignSystem.COLOR_TEXT}; }}"
+            f" QAbstractSpinBox::down-arrow:pressed {{ border-top-color: {DesignSystem.COLOR_TEXT}; }}"
         )
 
     @staticmethod
     def get_checkbox_style() -> str:
         return (
             f"QCheckBox {{ font-size: {DesignSystem.FONT_SIZE_BASE}px;"
-            f" color: {DesignSystem.COLOR_TEXT}; spacing: 8px; }}"
+            f" color: {DesignSystem.COLOR_TEXT}; spacing: 8px; background: transparent; }}"
+            f" QCheckBox:disabled {{ color: {DesignSystem.COLOR_TEXT_SECONDARY}; }}"
             f" QCheckBox::indicator {{ width: 18px; height: 18px;"
             f" border: 2px solid {DesignSystem.COLOR_BORDER};"
             f" border-radius: 4px;"
@@ -447,7 +538,52 @@ class DesignSystem:
             f" border-color: {DesignSystem.COLOR_PRIMARY}; }}"
             f" QCheckBox::indicator:hover {{"
             f" border-color: {DesignSystem.COLOR_PRIMARY}; }}"
+            f" QCheckBox::indicator:disabled {{"
+            f" background-color: {DesignSystem.COLOR_BORDER_LIGHT};"
+            f" border-color: {DesignSystem.COLOR_BORDER}; }}"
         )
+
+    @staticmethod
+    def get_slider_style() -> str:
+        return f"""
+            QSlider::groove:horizontal {{
+                border: 1px solid {DesignSystem.COLOR_BORDER};
+                height: 6px;
+                background: {DesignSystem.COLOR_SECONDARY_LIGHT};
+                margin: 2px 0;
+                border-radius: 3px;
+            }}
+            QSlider::groove:horizontal:disabled {{
+                background: {DesignSystem.COLOR_BORDER_LIGHT};
+                border-color: {DesignSystem.COLOR_BORDER_LIGHT};
+            }}
+            QSlider::handle:horizontal {{
+                background: {DesignSystem.COLOR_PRIMARY};
+                border: none;
+                width: 16px;
+                height: 16px;
+                margin: -5px 0;
+                border-radius: 8px;
+            }}
+            QSlider::handle:horizontal:hover {{
+                background: {DesignSystem.COLOR_PRIMARY_HOVER};
+            }}
+            QSlider::handle:horizontal:disabled {{
+                background: {DesignSystem.COLOR_BORDER};
+            }}
+            QSlider::sub-page:horizontal {{
+                background: {DesignSystem.COLOR_PRIMARY};
+                border-radius: 3px;
+            }}
+            QSlider::sub-page:horizontal:disabled {{
+                background: {DesignSystem.COLOR_BORDER};
+                border-radius: 3px;
+            }}
+            QSlider::add-page:horizontal {{
+                background: {DesignSystem.COLOR_BORDER_LIGHT};
+                border-radius: 3px;
+            }}
+        """
 
     # ==================== SCROLL AREA ====================
 
@@ -497,9 +633,9 @@ class DesignSystem:
     @staticmethod
     def get_settings_note_style() -> str:
         return (
-            f"font-size: {DesignSystem.FONT_SIZE_SM}px;"
+            f"QLabel {{ font-size: {DesignSystem.FONT_SIZE_SM}px;"
             f" color: {DesignSystem.COLOR_TEXT_SECONDARY};"
-            f" border: none; background: transparent;"
+            f" border: none; background: transparent; }}"
         )
 
     # ==================== ALERTS ====================
@@ -615,6 +751,28 @@ class DesignSystem:
             f" font-size: {DesignSystem.FONT_SIZE_XS}px;"
             f" font-weight: {DesignSystem.FONT_WEIGHT_MEDIUM};"
         )
+
+    @staticmethod
+    def get_tutorial_section_header_style() -> str:
+        return f"""
+            font-size: {DesignSystem.FONT_SIZE_LG}px;
+            font-weight: {DesignSystem.FONT_WEIGHT_SEMIBOLD};
+            color: {DesignSystem.COLOR_TEXT};
+            padding-bottom: {DesignSystem.SPACE_8}px;
+        """
+
+    @staticmethod
+    def get_tutorial_card_title_style() -> str:
+        return f"""
+            color: {DesignSystem.COLOR_TEXT};
+            font-size: {DesignSystem.FONT_SIZE_SM}px;
+            font-weight: {DesignSystem.FONT_WEIGHT_SEMIBOLD};
+        """
+
+    @staticmethod
+    def get_about_formats_text_style() -> str:
+        return f"color: {DesignSystem.COLOR_TEXT}; font-size: {DesignSystem.FONT_SIZE_XS}px;"
+
 
     # ==================== RECURSIVE CRAWL STATUS ====================
 
