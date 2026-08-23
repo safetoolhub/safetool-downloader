@@ -17,6 +17,7 @@ VERSION = os.environ.get("APP_VERSION", "0.1.0")
 # ── Data files ───────────────────────────────────────────────────────────────
 datas = [
     (str(ROOT / "assets"),  "assets"),
+    (str(ROOT / "i18n"), "i18n"),
     (str(ROOT / "LICENSE"), "."),
     (str(ROOT / "config.py"), "."),
 ]
